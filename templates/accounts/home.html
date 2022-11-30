@@ -1,0 +1,326 @@
+<!DOCTYPE html>
+<html>
+<title>W3.CSS</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="stylesheet" href="https://www.w3schools.com/w3css/4/w3.css">
+<link rel="stylesheet" href="https://www.w3schools.com/lib/w3-theme-teal.css">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css"><style>
+body {font-family: "Roboto", sans-serif}
+.w3-bar-block .w3-bar-item {
+  padding: 16px;
+  font-weight: bold;
+}
+
+header {
+  display: flex;
+  position: relative;
+
+}
+
+
+footer{
+  position: fixed;
+  bottom:0;
+  width: 100%;
+}
+.btn{
+  margin-top: 10px;
+}
+.tasks-btn,.float-right{
+  float: right;
+}
+table td {
+  overflow: hidden !important;
+  display: inline-block !important;
+  white-space: nowrap !important;
+}
+
+</style>
+<body>
+
+<nav class="w3-sidebar w3-bar-block w3-collapse w3-animate-left w3-card" style="z-index:3;width:250px;" id="mySidebar">
+  <a class="w3-bar-item w3-button w3-border-bottom w3-large"><span style="width:80%;">To Do</span></a>
+  <a class="w3-bar-item w3-button w3-hide-large w3-large" href="javascript:void(0)" onclick="w3_close()">Close <i class="fa fa-remove"></i></a>
+  <a class="w3-bar-item w3-button w3-teal" href="/home/">Today</a>
+  <div>
+    <a class="w3-bar-item w3-button" onclick="myAccordion('demo')" href="javascript:void(0)">History <i class="fa fa-caret-down"></i></a>
+    <div id="demo" class="w3-hide">
+      {% if old_days %}
+      {% for day in old_days %}
+        <a class="w3-bar-item w3-button test-onclick" href="/home/?day={{day.id}}">{{day.date}}</a>
+      {% endfor %}
+      {% else %}
+      <p>No previous tasks</p>
+      {% endif %}
+    </div>
+  </div>
+</nav>
+
+<div class="w3-overlay w3-hide-large w3-animate-opacity" onclick="w3_close()" style="cursor:pointer" id="myOverlay"></div>
+
+<div class="w3-main" style="margin-left:250px;">
+
+<div id="myTop" class="w3-container w3-top w3-theme w3-large">
+  <p><i class="fa fa-bars w3-button w3-teal w3-hide-large w3-xlarge" onclick="w3_open()"></i>
+  <span id="myIntro" class="w3-hide">W3.CSS: Introduction</span></p>
+</div>
+
+<header class="w3-container w3-theme" style="padding:20px">
+    <h1 class="w3-xlarge"> Day  <strong> {{ day_obj.date }} </strong></h1>
+</header>
+
+<div class="w3-container" style="padding-top:32px">
+  {% if groups %}
+    {% for group in groups %} 
+      <div id="{{group.title}}Form" class="task-form" method="post">
+        {% csrf_token %}
+        <div class="w3-card-4">
+          <div class="w3-container w3-teal">
+            <h2 class="header-group-name form-number-{{forloop.counter}}">{{group.title}}</h2>
+          </div>
+          <div class="w3-container table-container" >
+            <p>      
+              <label class="w3-text-teal"><b>task</b></label>
+              <input class="w3-input w3-border w3-sand task-text form-number-{{forloop.counter}}" name="first" type="text">
+              <button class="w3-btn w3-teal btn form-btn form-number-{{forloop.counter}}">add</button>
+              <button class="w3-btn w3-red btn delete-selected-btn  float-right" id="delete-selected">delete selected</button>
+              <div>
+                <input type="checkbox" id="checkAll" class="w3-check data-selected" title="select all">
+                <label class="w3-text-teal ">select all</label>
+              </div>
+            </p>
+            
+          </div>
+          
+              
+        </div>
+      </div>
+      <table class="w3-table-all w3-hoverable w3-container w3-card-4 table-tasks">
+        <tbody>
+        {% for task in group.tasks %}
+          <tr>
+            <td>
+              <input type="checkbox" value="{{task.id}}" class="w3-check checkbox data-selected" title="selected">
+            </td>
+            <td>
+              <div class="task-text">
+              {{ task.text }}
+              </div>
+            </td>
+            <td class="tasks-btn">
+              <a href="{% url 'delete-task' task.id %}">
+                <button class="w3-btn w3-red">delete</button>
+              </a>    
+            </td>
+          </tr>
+          {% endfor %}
+          </tbody>
+        </table>
+    {% endfor %}
+  {% else %}
+  <div id="Group Task 1Form" class="task-form" method="post">
+    {% csrf_token %}
+    <div class="w3-card-4">
+      <div class="w3-container w3-teal">
+        <h2 class="header-group-name">Group Task 1</h2>
+      </div>
+      <div class="w3-container table-container" >
+        <p>      
+          <label class="w3-text-teal"><b>task</b></label>
+          <input class="w3-input w3-border w3-sand task-text" name="first" type="text">
+          <button class="w3-btn w3-teal form-btn">add</button>
+        </p>
+        
+      </div>
+      
+          
+    </div>
+  </div>
+  {% endif %}
+</div>
+
+
+
+{% comment %} 
+<footer class="w3-container w3-theme" style="padding:32px">
+  <p>Footer information goes here</p>
+</footer>
+ {% endcomment %}
+     
+</div>
+
+<script>
+// Open and close the sidebar on medium and small screens
+function w3_open() {
+  document.getElementById("mySidebar").style.display = "block";
+  document.getElementById("myOverlay").style.display = "block";
+}
+
+function w3_close() {
+  document.getElementById("mySidebar").style.display = "none";
+  document.getElementById("myOverlay").style.display = "none";
+}
+
+// Change style of top container on scroll
+window.onscroll = function() {myFunction()};
+function myFunction() {
+  if (document.body.scrollTop > 80 || document.documentElement.scrollTop > 80) {
+    document.getElementById("myTop").classList.add("w3-card-4", "w3-animate-opacity");
+    document.getElementById("myIntro").classList.add("w3-show-inline-block");
+  } else {
+    document.getElementById("myIntro").classList.remove("w3-show-inline-block");
+    document.getElementById("myTop").classList.remove("w3-card-4", "w3-animate-opacity");
+  }
+}
+
+// Accordions
+function myAccordion(id) {
+  var x = document.getElementById(id);
+  if (x.className.indexOf("w3-show") == -1) {
+    x.className += " w3-show";
+    x.previousElementSibling.className += " w3-theme";
+  } else { 
+    x.className = x.className.replace("w3-show", "");
+    x.previousElementSibling.className = 
+    x.previousElementSibling.className.replace(" w3-theme", "");
+  }
+};
+
+
+
+</script>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.1/jquery.min.js" integrity="sha512-aVKKRRi/Q/YV+4mjoKBsE4x3H+BkegoM/em46NNlCqNTmUYADjBbeNefNxYV7giUp0VxICtqdrbqU7iVaeZNXA==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+
+<script type="text/javascript">
+
+
+
+////////////////////// csrf_token ///////////////////////
+  function getCookie(name) {
+    var cookieValue = null;
+    if (document.cookie && document.cookie !== '') {
+        var cookies = document.cookie.split(';');
+        for (var i = 0; i < cookies.length; i++) {
+            var cookie = jQuery.trim(cookies[i]);
+            // Does this cookie string begin with the name we want?
+            if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                break;
+            }
+        }
+    }
+    return cookieValue;
+}
+var csrftoken = getCookie('csrftoken');
+
+function csrfSafeMethod(method) {
+    // these HTTP methods do not require CSRF protection
+    return (/^(GET|HEAD|OPTIONS|TRACE)$/.test(method));
+}
+$.ajaxSetup({
+    beforeSend: function(xhr, settings) {
+        if (!csrfSafeMethod(settings.type) && !this.crossDomain) {
+            xhr.setRequestHeader("X-CSRFToken", csrftoken);
+        }
+    }
+});
+
+
+////////////////////// csrf_token ///////////////////////
+
+
+$('.form-btn').on('click',function(){
+  var classes = $(this).attr('class').split(" ");
+  var formClass = classes[classes.length - 1]
+  console.log(formClass);
+  var group_name = $(`.header-group-name.${formClass}`).text();
+  var text = $(`.task-text.${formClass}`).val();
+  
+
+  console.log({
+    group_name: group_name,
+    text: text,
+  
+  });
+
+  $.ajax({
+      type:"POST",
+      data: {
+        group_name: group_name,
+        text: text,
+      },
+      url: window.location.href,
+      cache: false,
+      dataType: "html",
+      success: function(){
+          window.location.reload();
+      },
+      error: function(){
+          alert("false");
+      }
+  });
+});
+
+$('#checkAll').on('click',function(){
+  if(this.checked){
+      $('.checkbox').each(function(){
+          this.checked = true;
+      });
+  }else{
+       $('.checkbox').each(function(){
+          this.checked = false;
+      });
+  }
+});
+
+
+
+$('.checkbox').on('click',function(){
+  if($('.checkbox:checked').length == $('.checkbox').length){
+      $('#checkAll').prop('checked',true);
+  }else{
+      $('#checkAll').prop('checked',false);
+  }
+});
+
+
+$('#delete-selected').on('click',function(){
+  var ids = [];
+  $('.checkbox:checked').each(function() {
+      ids.push(this.value);
+  });
+  $.ajax({
+      type:"POST",
+      data: {ids:ids},
+      url: '/multi-delete/',
+      cache: false,
+      dataType: "html",
+      success: function(){
+          window.location.reload();
+      },
+      error: function(){
+          alert("false");
+      }
+  });
+});
+
+$(function() {
+  $('#delete-selected').hide(); 
+  $('.data-selected').change(function(){
+      if(this.checked){
+          $('#delete-selected').show(); 
+      } else {
+          if($('.checkbox:checked').length == 0){
+          $('#delete-selected').hide(); 
+          };
+      } 
+  });
+});
+
+
+</script>
+
+</body>
+</html> 
